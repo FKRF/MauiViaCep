@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -15,9 +16,10 @@ namespace MauiViaCep
         private async void OnConsultarClicked(object sender, EventArgs e)
         {
             string cep = cepEntry.Text.Trim().Replace("-", "");
-            if (string.IsNullOrWhiteSpace(cep) || cep.Length != 8 || (cep) )
+            int n;
+            if (string.IsNullOrWhiteSpace(cep) || !Regex.IsMatch(cep, @"\d{8}$") )
             {
-                await DisplayAlert("Erro", "Digite um CEP!", "Ok");
+                await DisplayAlert("Erro", "Digite um CEP válido!", "Ok");
                 return;
             }
             try
@@ -28,7 +30,6 @@ namespace MauiViaCep
                 var response = await client.GetStringAsync(url);
                 if (response.Contains("\"erro\""))
                     resultadoLbl.Text = "CEP não encontrado!";
-                    //Console.WriteLine()
                 else
                 {
                     var endereco = JsonConvert.DeserializeObject<Endereco>(response);
